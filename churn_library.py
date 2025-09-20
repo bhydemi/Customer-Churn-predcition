@@ -280,23 +280,16 @@ def train_models(X_train, X_test, y_train, y_test):
     output:
               None
     """
-    rfc = RandomForestClassifier(random_state=42)
+    # Use simplified parameters for faster training
+    rfc = RandomForestClassifier(random_state=42, n_estimators=100, max_depth=10)
     lrc = LogisticRegression(random_state=42, max_iter=3000)
 
-    param_grid = {
-        'n_estimators': [200, 500],
-        'max_features': ['auto', 'sqrt'],
-        'max_depth': [4, 5, 100],
-        'criterion': ['gini', 'entropy']
-    }
-
-    cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
-    cv_rfc.fit(X_train, y_train)
-
+    # Train models
+    rfc.fit(X_train, y_train)
     lrc.fit(X_train, y_train)
 
-    y_train_preds_rf = cv_rfc.best_estimator_.predict(X_train)
-    y_test_preds_rf = cv_rfc.best_estimator_.predict(X_test)
+    y_train_preds_rf = rfc.predict(X_train)
+    y_test_preds_rf = rfc.predict(X_test)
 
     y_train_preds_lr = lrc.predict(X_train)
     y_test_preds_lr = lrc.predict(X_test)
@@ -311,25 +304,37 @@ def train_models(X_train, X_test, y_train, y_test):
 
     # Generate feature importance plot
     feature_importance_plot(
-        cv_rfc.best_estimator_,
+        rfc,
         X_train,
         './images/results/feature_importance.png')
 
     # ROC curves
     plt.figure(figsize=(15, 8))
     ax = plt.gca()
-    plot_roc_curve(cv_rfc.best_estimator_, X_test, y_test, ax=ax, alpha=0.8)
-    plot_roc_curve(lrc, X_test, y_test, ax=ax, alpha=0.8)
-    plt.title('ROC Curves')
+    plot_roc_curve(rfc, X_test, y_test, ax=ax, alpha=0.8, name='Random Forest')
+    plot_roc_curve(lrc, X_test, y_test, ax=ax, alpha=0.8, name='Logistic Regression')
+    plt.title('ROC Curves - Model Comparison')
+    plt.legend()
     plt.savefig(
         './images/results/roc_curves.png',
         dpi=300,
         bbox_inches='tight')
     plt.close()
 
-    # Save best models
-    joblib.dump(cv_rfc.best_estimator_, './models/rfc_model.pkl')
+    # Save models with versioned names including date
+    from datetime import datetime
+    date_str = datetime.now().strftime('%Y%m%d')
+    
+    joblib.dump(rfc, f'./models/rfc_model_{date_str}.pkl')
+    joblib.dump(lrc, f'./models/logistic_model_{date_str}.pkl')
+    
+    # Also save with standard names for backward compatibility
+    joblib.dump(rfc, './models/rfc_model.pkl')
     joblib.dump(lrc, './models/logistic_model.pkl')
+    
+    print(f"Models saved successfully:")
+    print(f"- Random Forest: rfc_model_{date_str}.pkl")
+    print(f"- Logistic Regression: logistic_model_{date_str}.pkl")
 
 
 if __name__ == "__main__":
