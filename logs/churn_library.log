@@ -1,0 +1,16 @@
+root - INFO - Starting churn library tests...
+root - INFO - Testing import_data: SUCCESS
+root - INFO - Testing import_data: DataFrame has rows and columns
+root - INFO - Testing import_data: Churn column created successfully
+root - INFO - Testing perform_eda: SUCCESS
+root - INFO - Testing perform_eda: All EDA images created successfully
+root - INFO - Testing encoder_helper: SUCCESS
+root - INFO - Testing encoder_helper: All encoded columns created successfully
+root - INFO - Testing encoder_helper: All encoded columns are numeric
+root - INFO - Testing perform_feature_engineering: SUCCESS
+root - INFO - Testing perform_feature_engineering: Train/test splits have correct shapes
+root - INFO - Testing perform_feature_engineering: Feature matrix and target vector dimensions are consistent
+root - INFO - Testing classification_report_image: SUCCESS
+root - INFO - Testing classification_report_image: Classification report image created successfully
+root - INFO - Testing feature_importance_plot: SUCCESS
+root - INFO - Testing feature_importance_plot: Feature importance plot created successfully
